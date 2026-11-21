@@ -32,13 +32,19 @@ var NZ_API = 'https://script.google.com/macros/s/AKfycbyp8Fa5xU6sQPjSzkR5eLTnRfu
 (function(){
   var m = (location.hash || '').match(/k=([\w-]+)/), key = m ? m[1] : '';
   try { if (key) localStorage.setItem('nzKey', key); else key = localStorage.getItem('nzKey') || ''; } catch (e) {}
+  if (m && history.replaceState) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
   function show(html){ document.open(); document.write(html.replace('<head>', '<head><script>window.NZ_API=' + JSON.stringify(NZ_API) + ';<\/script>')); document.close(); }
   function ask(msg){
-    document.getElementById('b').innerHTML = '<img src="icon-192.png" alt=""><div class="c"><b>Nurzaman · Объекты</b><div style="color:#6b7487;font-size:14px;margin-top:6px">Введите ключ доступа — один раз на этом устройстве</div><input id="k" placeholder="ключ доступа" autocomplete="off"><button id="go">Войти</button></div>' + (msg ? '<div class="e">' + msg + '</div>' : '');
-    document.getElementById('go').onclick = function(){ var v = document.getElementById('k').value.trim(); if (!v) return; try { localStorage.setItem('nzKey', v); } catch (e) {} location.reload(); };
+    document.getElementById('b').innerHTML = '<img src="icon-192.png" alt=""><div class="c"><b>Nurzaman · Объекты</b><div style="color:#6b7487;font-size:14px;margin-top:6px">Один раз на этом устройстве: вставьте ссылку на приложение (или только ключ)</div><input id="k" placeholder="ссылка или ключ" autocomplete="off"><button id="pst" style="background:#eef2fa;color:#13274a;margin-bottom:8px">📋 Вставить из буфера</button><button id="go">Войти</button></div>' + (msg ? '<div class="e">' + msg + '</div>' : '');
+    var keyOf = function(v){ v = String(v || '').trim(); var mm = v.match(/k=([\w-]+)/); return mm ? mm[1] : v.replace(/\s+/g, ''); };
+    document.getElementById('pst').onclick = function(){ if (navigator.clipboard && navigator.clipboard.readText) navigator.clipboard.readText().then(function(t){ document.getElementById('k').value = t; }).catch(function(){}); };
+    document.getElementById('go').onclick = function(){ var v = keyOf(document.getElementById('k').value); if (!v) return; try { localStorage.setItem('nzKey', v); } catch (e) {} location.replace(location.pathname); };
   }
   if (!key) return ask('');
+  // данные начинаем грузить сразу, параллельно с оболочкой
+  window.NZ_PRE = fetch(NZ_API, { method: 'POST', body: JSON.stringify({ key: key, fn: 'objectsAppData', args: [] }) }).then(function(r){ return r.json(); }).then(function(j){ if (!j.ok) throw new Error(j.error || 'Ошибка'); return j.result; });
+  window.NZ_PRE.catch(function(){});
   var cached = null; try { cached = localStorage.getItem('nzHtml'); } catch (e) {}
   var req = fetch(NZ_API, { method: 'POST', body: JSON.stringify({ key: key, fn: 'objectsAppPwaHtml', args: [] }) })
     .then(function(r){ return r.json(); })
