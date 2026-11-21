@@ -1,0 +1,32 @@
+{
+ "name": "Nurzaman — Объекты",
+ "short_name": "Nurzaman",
+ "description": "Кто работал на этаже: акты, договоры, отчёты",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#f5f6f9",
+ "theme_color": "#13274a",
+ "lang": "ru",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ],
+ "start_url": "./",
+ "scope": "./"
+}

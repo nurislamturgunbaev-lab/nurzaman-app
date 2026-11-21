@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nurzaman · Объекты</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#13274a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Nurzaman">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+html,body{margin:0;height:100%;font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(160deg,#13274a,#0d1c38)}
+.b{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#dfe6f5}
+.b img{width:96px;height:96px;border-radius:22px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.s{width:34px;height:34px;border:3px solid rgba(255,255,255,.2);border-top-color:#f2a516;border-radius:50%;animation:r 1s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+.c{background:#fff;color:#111a2e;border-radius:20px;padding:24px;width:min(360px,88vw);text-align:center}
+.c input{width:100%;box-sizing:border-box;font:inherit;padding:12px;border:1px solid #e7eaf1;border-radius:12px;margin:12px 0}
+.c button{width:100%;font:inherit;font-weight:700;color:#fff;border:0;border-radius:12px;padding:12px;background:linear-gradient(180deg,#f7b733,#f2a516)}
+.e{color:#ffb4b4;font-size:13px;max-width:320px;text-align:center}
+</style>
+</head>
+<body>
+<div class="b" id="b"><img src="icon-192.png" alt=""><div class="s"></div><div id="m">Загружаю…</div></div>
+<script>
+// Nurzaman · Объекты — загрузчик. Само приложение и данные приходят из Google Таблицы (Apps Script).
+var NZ_API = 'https://script.google.com/macros/s/AKfycbyp8Fa5xU6sQPjSzkR5eLTnRfueW4qFOVHpWq4BS1hUeNQfCVSLK-Vivs7ruJiPYpQ/exec';
+(function(){
+  var m = (location.hash || '').match(/k=([\w-]+)/), key = m ? m[1] : '';
+  try { if (key) localStorage.setItem('nzKey', key); else key = localStorage.getItem('nzKey') || ''; } catch (e) {}
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+  function show(html){ document.open(); document.write(html.replace('<head>', '<head><script>window.NZ_API=' + JSON.stringify(NZ_API) + ';<\/script>')); document.close(); }
+  function ask(msg){
+    document.getElementById('b').innerHTML = '<img src="icon-192.png" alt=""><div class="c"><b>Nurzaman · Объекты</b><div style="color:#6b7487;font-size:14px;margin-top:6px">Введите ключ доступа — один раз на этом устройстве</div><input id="k" placeholder="ключ доступа" autocomplete="off"><button id="go">Войти</button></div>' + (msg ? '<div class="e">' + msg + '</div>' : '');
+    document.getElementById('go').onclick = function(){ var v = document.getElementById('k').value.trim(); if (!v) return; try { localStorage.setItem('nzKey', v); } catch (e) {} location.reload(); };
+  }
+  if (!key) return ask('');
+  var cached = null; try { cached = localStorage.getItem('nzHtml'); } catch (e) {}
+  var req = fetch(NZ_API, { method: 'POST', body: JSON.stringify({ key: key, fn: 'objectsAppPwaHtml', args: [] }) })
+    .then(function(r){ return r.json(); })
+    .then(function(j){ if (!j.ok) throw new Error(j.error || 'Ошибка'); try { localStorage.setItem('nzHtml', j.result); } catch (e) {} return j.result; });
+  if (cached) { show(cached); req.catch(function(){}); return; }   // быстрый старт; свежая версия — при следующем открытии
+  req.then(show).catch(function(e){
+    if (/ключ/.test(e.message)) { try { localStorage.removeItem('nzKey'); } catch (x) {} return ask('Неверный ключ'); }
+    document.getElementById('m').textContent = 'Нет связи с таблицей: ' + e.message;
+  });
+})();
+</script>
+</body>
+</html>
