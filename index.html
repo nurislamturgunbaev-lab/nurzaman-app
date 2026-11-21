@@ -49,7 +49,7 @@ var NZ_API = 'https://script.google.com/macros/s/AKfycbyp8Fa5xU6sQPjSzkR5eLTnRfu
   var req = fetch(NZ_API, { method: 'POST', body: JSON.stringify({ key: key, fn: 'objectsAppPwaHtml', args: [] }) })
     .then(function(r){ return r.json(); })
     .then(function(j){ if (!j.ok) throw new Error(j.error || 'Ошибка'); try { localStorage.setItem('nzHtml', j.result); } catch (e) {} return j.result; });
-  if (cached) { show(cached); req.catch(function(){}); return; }   // быстрый старт; свежая версия — при следующем открытии
+  if (cached) { setTimeout(function(){ show(cached); }, 0); req.catch(function(){}); return; }   // после разбора страницы, иначе document.open игнорируется   // быстрый старт; свежая версия — при следующем открытии
   req.then(show).catch(function(e){
     if (/ключ/.test(e.message)) { try { localStorage.removeItem('nzKey'); } catch (x) {} return ask('Неверный ключ'); }
     document.getElementById('m').textContent = 'Нет связи с таблицей: ' + e.message;
