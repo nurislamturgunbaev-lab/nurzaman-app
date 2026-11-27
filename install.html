@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Скачать Nurzaman · Объекты</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#13274a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nurzaman">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+body{margin:0;min-height:100vh;font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(160deg,#13274a,#0d1c38);color:#111a2e;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+.c{background:#fff;border-radius:22px;padding:26px 22px;width:min(440px,100%);text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.c img.i{width:88px;height:88px;border-radius:20px;box-shadow:0 8px 22px rgba(19,39,74,.3)}
+h1{font-size:21px;margin:12px 0 4px}
+.sub{color:#6b7487;font-size:14px;margin-bottom:18px}
+.btn{display:block;width:100%;box-sizing:border-box;font:inherit;font-weight:700;font-size:17px;color:#fff;border:0;border-radius:14px;padding:15px;background:linear-gradient(180deg,#f7b733,#f2a516);cursor:pointer;text-decoration:none;margin-top:10px}
+.btn.sec{background:#eef2fa;color:#13274a}
+.btn:disabled{opacity:.5}
+.st{font-size:14px;color:#1b7a3e;margin-top:10px;min-height:18px}
+.how{text-align:left;background:#f6f8fc;border-radius:14px;padding:12px 14px;margin-top:16px;font-size:14px;line-height:1.5;display:none}
+.how b{display:block;margin-bottom:4px;color:#13274a}
+.how.on{display:block}
+.qr{margin-top:18px;font-size:13px;color:#6b7487}
+.qr img{width:150px;height:150px;display:block;margin:8px auto 0;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="c">
+  <img class="i" src="icon-192.png" alt="">
+  <h1>Nurzaman · Объекты</h1>
+  <div class="sub">Объекты, АВР, договоры, 3D и отчёты — как приложение на телефоне и компьютере</div>
+  <button class="btn" id="inst" disabled>⬇ Скачать приложение</button>
+  <div class="st" id="st"></div>
+  <a class="btn sec" href="./">Открыть в браузере</a>
+
+  <div class="how" id="ios"><b>iPhone / iPad</b>1. Откройте эту страницу в <b style="display:inline">Safari</b>.<br>2. Нажмите «Поделиться» <span style="font-size:17px">⬆</span> внизу экрана.<br>3. Выберите «На экран „Домой“» → «Добавить».</div>
+  <div class="how" id="and"><b>Android</b>Если кнопка не сработала: Chrome → меню ⋮ → «Установить приложение» (или «Добавить на гл. экран»).</div>
+  <div class="how" id="pc"><b>Компьютер (Chrome / Edge)</b>Если кнопка не сработала: значок установки ⊕ справа в адресной строке или меню ⋮ → «Установить Nurzaman».</div>
+
+  <div class="qr">Откройте на телефоне — наведите камеру:<img id="qr" alt="QR-код"></div>
+  <div class="sub" style="margin:14px 0 0;font-size:12.5px">При первом запуске приложение попросит ссылку с ключом — её выдаёт администратор.</div>
+</div>
+<script>
+var url = location.href.split('#')[0].replace(/install\.html.*$/, 'install.html');
+document.getElementById('qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=' + encodeURIComponent(url);
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+var ua = navigator.userAgent, ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(ua)), and = /Android/i.test(ua);
+var standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+var b = document.getElementById('inst'), st = document.getElementById('st'), P = null;
+document.getElementById(ios ? 'ios' : and ? 'and' : 'pc').classList.add('on');
+if (standalone) { st.textContent = '✓ Приложение уже установлено'; b.textContent = 'Открыть приложение'; b.disabled = false; b.onclick = function () { location.href = './'; }; }
+else if (ios) { b.disabled = false; b.onclick = function () { st.textContent = 'На iPhone: «Поделиться» ⬆ → «На экран „Домой“»'; document.getElementById('ios').scrollIntoView({ behavior: 'smooth' }); }; }
+else { st.textContent = 'Подготавливаю установку…'; setTimeout(function () { if (!P) { st.textContent = ''; b.disabled = false; b.onclick = function () { st.textContent = 'Установите через меню браузера — см. подсказку ниже'; }; } }, 4000); }
+window.addEventListener('beforeinstallprompt', function (e) {
+  e.preventDefault(); P = e; b.disabled = false; st.textContent = '';
+  b.onclick = function () { P.prompt(); P.userChoice.then(function (r) { st.textContent = r.outcome === 'accepted' ? '✓ Установлено — значок Nurzaman появится на рабочем столе' : 'Установка отменена'; P = null; }); };
+});
+window.addEventListener('appinstalled', function () { st.textContent = '✓ Установлено — значок Nurzaman появится на рабочем столе'; });
+</script>
+</body>
+</html>
